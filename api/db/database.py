@@ -5,8 +5,7 @@ from pymongo.errors import ConnectionFailure
 from api.v1.schemas.response_models import ErrorResponse, ErrorData
 
 
-DB_HOST = settings.DB_HOST
-DB_PORT = settings.DB_PORT
+DB_URI = settings.DB_URI
 DB_NAME = settings.DB_NAME
 
 
@@ -14,9 +13,7 @@ def init_db() -> None:
     """Initialize MongoDB connection using mongoengine"""
     try:
         connect(
-            db=DB_NAME,
-            host=DB_HOST,
-            port=DB_PORT
+            host=DB_URI
         )
         logger.info(f"Connected to MongoDB: {DB_NAME}")
     except ConnectionFailure as e:
