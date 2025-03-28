@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 from api.core.config import settings
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -9,6 +9,9 @@ from api.v1.schemas.response_models import (
 from starlette.requests import Request
 import uvicorn
 from api.db.database import init_db
+from api.utils import logger
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 
 
 LOG_FILE = "uvicorn.log"
@@ -110,6 +113,61 @@ async def health_check():
         data={"status": "healthy"}
     )
     return success_response
+
+
+# REGISTER EXCEPTION HANDLERS
+@app.exception_handler(HTTPException)
+async def http_exception(request: Request, exc: HTTPException):
+    """HTTP exception handler"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "status_code": exc.status_code,
+            "message": exc.detail,
+            "data": None
+        },
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception(request: Request, exc: RequestValidationError):
+    """Validation exception handler"""
+    errors = [{
+        "loc": " -> ".join(map(str, error["loc"])),
+        "msg": error["msg"],
+        "type": error["type"]
+    } for error in exc.errors()]
+
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "status": "error",
+            "status_code": status.HTTP_422_UNPROCESSABLE_ENTITY,
+            "message": "Validation error",
+            "data": {
+                "errors": errors
+            }
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception(request: Request, exc: Exception):
+    """Global exception handler for unexpected errors"""    
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "status": "error",
+            "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "message": "An internal server error occurred",
+            "data": {
+                "error_type": type(exc).__name__,
+                "detail": str(exc) if settings.DEBUG else None
+            }
+        },
+    )
+
 
 
 if __name__ == "__main__":
