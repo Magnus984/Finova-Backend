@@ -3,9 +3,12 @@ from api.core.config import settings
 from api.utils.logger import logger
 from pymongo.errors import ConnectionFailure
 from api.v1.schemas.response_models import ErrorResponse, ErrorData
+from api.utils.logger import logger
 
 
-DB_URI = settings.DB_URI
+DB_URI = settings.COSMOS_DB_URI
+logger.info(f"MongoDB URI: {DB_URI}")
+print(f"MongoDB URI: {DB_URI}")
 DB_NAME = settings.DB_NAME
 
 
