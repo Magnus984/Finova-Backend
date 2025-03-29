@@ -15,6 +15,14 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_MINUTES: int
+    ANTHROPIC_API_KEY: str
+    LANGSMITH_PROJECT: str
+    LANGSMITH_ENDPOINT: str
+    LANGSMITH_API_KEY: str
+    LANGSMITH_TRACING: bool = True
+    # AI Model settings
+    GROQ_API_KEY: str
+    OPENAI_API_KEY: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
