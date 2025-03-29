@@ -12,6 +12,7 @@ from api.db.database import init_db
 from api.utils import logger
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from api.v1.routes import api_version_one
 
 
 LOG_FILE = "uvicorn.log"
@@ -32,6 +33,8 @@ app = FastAPI(
     docs_url="/docs"
     )
 
+openapi_security = [{"bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}}]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,6 +43,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(
+    api_version_one,
+    prefix=settings.API_V1_STR,
+)
 
 @app.get("/",
          tags=["Home"],
@@ -125,8 +132,10 @@ async def http_exception(request: Request, exc: HTTPException):
             "status": "error",
             "status_code": exc.status_code,
             "message": exc.detail,
-            "data": None
-        },
+            "data": {
+                "error_type": type(exc).__name__
+            }
+        }
     )
 
 
