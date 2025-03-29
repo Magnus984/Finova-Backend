@@ -12,6 +12,7 @@ from api.db.database import init_db
 from api.utils import logger
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from api.v1.routes import router as api_v1_router
 
 
 LOG_FILE = "uvicorn.log"
@@ -19,7 +20,7 @@ uvicorn_logger = logging.getLogger("uvicorn")
 file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10485760, backupCount=5)
 file_handler.setFormatter(
     logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    )
+)
 uvicorn_logger.addHandler(file_handler)
 
 # Initialize the database
@@ -30,15 +31,18 @@ app = FastAPI(
     description="",
     version="1.0.0",
     docs_url="/docs"
-    )
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Update with specific origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include all v1 API routes
+app.include_router(api_v1_router, prefix="/api/v1")
 
 
 @app.get("/",
@@ -50,22 +54,20 @@ app.add_middleware(
                  "description": "Welcome response"
              }
          })
-
-
-
 async def get_root(request: Request) -> dict:
     """
     Root endpoint for the API
-    
+
     Returns:
         Standardized success response with welcome message
     """
     success_response = SuccessResponse(
         status_code=status.HTTP_200_OK,
-        message="Welcome to Finova Backend",
+        message="Welcome to Finova API. Access the API documentation at /docs",
         data={}
     )
     return success_response
+
 
 @app.get("/probe",
          tags=["Home"],
@@ -79,7 +81,7 @@ async def get_root(request: Request) -> dict:
 async def probe():
     """
     Probe endpoint to check if the API is running
-    
+
     Returns:
         Standardized success response confirming API is running
     """
@@ -103,7 +105,7 @@ async def probe():
 async def health_check():
     """
     Health check endpoint for monitoring
-    
+
     Returns:
         Standardized success response with health status
     """
@@ -154,7 +156,7 @@ async def validation_exception(request: Request, exc: RequestValidationError):
 
 @app.exception_handler(Exception)
 async def global_exception(request: Request, exc: Exception):
-    """Global exception handler for unexpected errors"""    
+    """Global exception handler for unexpected errors"""
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -167,7 +169,6 @@ async def global_exception(request: Request, exc: Exception):
             }
         },
     )
-
 
 
 if __name__ == "__main__":
