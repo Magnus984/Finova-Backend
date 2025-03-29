@@ -9,7 +9,7 @@ def get_financial_analysis_prompt(financial_data, tools, agent_scratchpad, tool_
     {tools}
     Tool names:
     {tool_names}
-    
+
     Follow a strict ReAct (Reasoning-Action) cycle. For every step:
     1. Write your "Thought:" clearly stating your reasoning or plan.
     2. Immediately follow your Thought with a single "Action:" line. Do not skip this step.
@@ -28,11 +28,11 @@ def get_financial_analysis_prompt(financial_data, tools, agent_scratchpad, tool_
     - Return your response in valid JSON format.
     - Avoid redundant calculations and ensure every Thought is followed by an Action.
 
-    RESPONSE FORMAT INSTRUCTIONS:
-    - Output MUST be valid JSON.
-    - Use double quotes for all property names and string values.
-    - Format numbers as numeric values (not strings).
-    - Do NOT include any markdown formatting or backticks.
+    FINAL OUTPUT RULES:
+    1. After completing all steps, provide ONLY the final JSON
+    2. Remove all Thought/Action/Observation traces
+    3. Ensure JSON is properly closed
+    4. Never include markdown backticks
 
     DETAILED EXAMPLE OUTPUT FORMAT:
     {{{{

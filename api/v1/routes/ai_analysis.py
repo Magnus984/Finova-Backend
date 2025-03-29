@@ -8,6 +8,8 @@ financial_agent = FinancialAgent()
 
 
 @router.post("/analyze",
+             response_model=SuccessResponse[Dict[str, Any]],
+             responses={400: {"model": ErrorResponse}}
              )
 async def analyze_financial_data(request: Dict[str, Any]):
     """Analyze financial data to generate comprehensive financial statements and DuPont analysis.
