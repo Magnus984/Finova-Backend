@@ -33,6 +33,7 @@ def get_financial_analysis_prompt(financial_data, tools, agent_scratchpad, tool_
     2. Remove all Thought/Action/Observation traces
     3. Ensure JSON is properly closed
     4. Never include markdown backticks
+    5. Replace the year part part of the data with the month name from the data headers given
 
     DETAILED EXAMPLE OUTPUT FORMAT:
     {{{{
